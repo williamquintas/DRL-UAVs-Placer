@@ -1,10 +1,10 @@
 import utils.location as loc
 import utils.constants as const
 
-def build_uav():
-    uav = {}
+def build_host():
+    host = {}
 
     position = loc.generate_random_position(const.SPACE_SIZE)
-    uav['position'] = position
+    host['position'] = position
 
-    return uav
+    return host
