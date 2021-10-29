@@ -6,8 +6,8 @@ random.seed(1)
 
 def generate_random_position(max_value=10):
     point = {
-        'x': round(random.uniform(0,max_value), 2),
-        'y': round(random.uniform(0,max_value), 2)
+        'x': round(random.uniform(0,max_value), 1),
+        'y': round(random.uniform(0,max_value), 1)
     }
     return point
 

@@ -85,6 +85,5 @@ def plot(simulation):
     plt.title('Simulation')
     plt.xlabel('X')
     plt.ylabel('Y')
-
     plt.show()
     plt.clf()
