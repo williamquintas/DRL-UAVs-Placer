@@ -1,19 +1,16 @@
-import random
-
-# comment the line below to generate different random numbers
-random.seed(1)
-
-def generate_random_position():
-    point = {
-        'x': round(random.uniform(0,10), 2),
-        'y': round(random.uniform(0,10), 2)
-    }
-    return point
+import utils.location as loc
+import utils.constants as const
 
 def build_uav():
     uav = {}
 
-    position = generate_random_position()
+    position = loc.generate_random_position(const.SPACE_SIZE)
     uav['position'] = position
 
+    return uav
+
+def move(uav, x_step, y_step):
+    position = uav['position']
+    position['x'] += x_step
+    position['y'] += y_step
     return uav

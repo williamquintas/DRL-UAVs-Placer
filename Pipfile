@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 matplotlib = "*"
+numpy = "*"
+gym = "*"
 
 [dev-packages]
 
