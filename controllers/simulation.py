@@ -3,24 +3,7 @@ import controllers.uav as uav
 
 import matplotlib.pyplot as plt
 import utils.location as loc
-from utils.constants import SPACE_SIZE 
-
-def calculate_center_of_mass(hosts_dict):
-    x_sum = 0.0
-    y_sum = 0.0
-
-    for host_index in hosts_dict:
-        host = hosts_dict[host_index]
-        position = host['position']
-        x_sum += position['x']
-        y_sum += position['y']
-
-    center_of_mass = {
-        'x': round(x_sum/len(hosts_dict), 2),
-        'y': round(y_sum/len(hosts_dict), 2)
-    }
-
-    return center_of_mass
+from utils.constants import SPACE_SIZE
 
 
 def init_simulation(host_quantity=2, uav_quantity=1):
@@ -43,6 +26,25 @@ def init_simulation(host_quantity=2, uav_quantity=1):
     simulation['center_of_mass'] = calculate_center_of_mass(hosts_dict)
 
     return simulation
+
+
+def calculate_center_of_mass(hosts_dict):
+    x_sum = 0.0
+    y_sum = 0.0
+
+    for host_index in hosts_dict:
+        host = hosts_dict[host_index]
+        position = host['position']
+        x_sum += position['x']
+        y_sum += position['y']
+
+    center_of_mass = {
+        'x': round(x_sum/len(hosts_dict), 2),
+        'y': round(y_sum/len(hosts_dict), 2)
+    }
+
+    return center_of_mass
+
 
 def plot(simulation):
     x = list()
