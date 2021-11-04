@@ -6,24 +6,27 @@ import utils.location as loc
 from utils.constants import SPACE_SIZE
 
 
-def init_simulation(host_quantity=2, uav_quantity=1):
+def init_simulation(host_quantity=2, uav_quantity=1, **kw_args):
     simulation = {}
     hosts_dict = {}
     uavs_dict = {}
 
-    for host_index in range(host_quantity):
-        hosts_dict.update({
-            f'host_{host_index}': host.build_host()
-        })
+    if 'hosts' in kw_args:
+        simulation['hosts'] = kw_args['hosts']
+    else:
+        for host_index in range(host_quantity):
+            hosts_dict.update({
+                f'host_{host_index}': host.build_host()
+            })
+        simulation['hosts'] = hosts_dict
 
     for uav_index in range(uav_quantity):
         uavs_dict.update({
             f'uav_{uav_index}': uav.build_uav()
         })
 
-    simulation['hosts'] = hosts_dict
     simulation['uavs'] = uavs_dict
-    simulation['center_of_mass'] = calculate_center_of_mass(hosts_dict)
+    simulation['center_of_mass'] = calculate_center_of_mass(simulation['hosts'])
 
     return simulation
 

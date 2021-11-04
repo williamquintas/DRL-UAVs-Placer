@@ -101,7 +101,7 @@ class UAVPlacerEnv(Env):
 
 
     def reset(self):
-        sim = simulation.init_simulation()
+        sim = simulation.init_simulation(hosts=self.state['hosts'])
         self.state = sim
         self.remaining_substeps = NUMBER_OF_SUBSTEPS
         return self.state
