@@ -2,6 +2,7 @@ import controllers.host as host
 import controllers.uav as uav
 
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 import utils.location as loc
 from utils.constants import SPACE_SIZE
 
@@ -48,39 +49,33 @@ def calculate_center_of_mass(hosts_dict):
 
     return center_of_mass
 
-
-def plot(simulation):
-    x = list()
-    y = list()
-    labels = list()
-    colors = list()
-
-    # Plots hosts
-    hosts_dict = simulation['hosts']
-    for host_index in hosts_dict:
-        host = hosts_dict[host_index]
+def build_hosts_rendering(hosts, x, y, labels, colors):
+    for host_index in hosts:
+        host = hosts[host_index]
         position = host['position']
         x.append(position['x'])
         y.append(position['y'])
         labels.append(host_index)
         colors.append('black')
 
-    # Plots center of mass
-    center_of_mass = simulation['center_of_mass']
-    plt.scatter(center_of_mass['x'], center_of_mass['y'], color=['red'])
-    plt.annotate('center_of_mass', (center_of_mass['x'], center_of_mass['y']))
+def build_center_of_mass_rendering(center_of_mass, x, y, labels, colors):
+    x.append(center_of_mass['x'])
+    y.append(center_of_mass['y'])
+    labels.append('center_of_mass')
+    colors.append('red')
 
-    # Plots UAVs - TODO: plot UAVs moving
-    uavs_dict = simulation['uavs']
-    for uav_index in uavs_dict:
-        uav = uavs_dict[uav_index]
+def build_uavs_rendering(uavs, x, y, labels, colors):
+    for uav_index in uavs:
+        uav = uavs[uav_index]
         position = uav['position']
         x.append(position['x'])
         y.append(position['y'])
         labels.append(uav_index)
         colors.append('blue')
 
-    plt.scatter(x, y, color=colors)
+def render(x, y, labels, colors):
+    fig = plt.figure
+    scat = plt.scatter(x, y, color=colors)
     for i, txt in enumerate(labels):
         plt.annotate(txt, (x[i], y[i]))
 
@@ -89,4 +84,16 @@ def plot(simulation):
     plt.xlabel('X')
     plt.ylabel('Y')
     plt.show()
+
+def plot_graph(simulation):
+    x = list()
+    y = list()
+    labels = list()
+    colors = list()
+
+    build_hosts_rendering(simulation['hosts'], x, y, labels, colors)
+    build_center_of_mass_rendering(simulation['center_of_mass'], x, y, labels, colors)
+    build_uavs_rendering(simulation['uavs'], x, y, labels, colors)
+
+    render(x, y, labels, colors)
     plt.clf()
