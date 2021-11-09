@@ -11,6 +11,11 @@ def build_uav():
 
 def move(uav, x_step, y_step):
     position = uav['position']
-    position['x'] += x_step
-    position['y'] += y_step
+    new_x = position['x'] + x_step
+    new_y = position['y'] + y_step
+
+    if loc.check_limits(new_x, new_y, float(const.SPACE_SIZE)):
+        position['x'] = new_x
+        position['y'] = new_y
+
     return uav
