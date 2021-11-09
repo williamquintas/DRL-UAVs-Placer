@@ -108,7 +108,6 @@ class UAVPlacerEnv(Env):
 
         reward = self._calculate_reward(current_state, self.state)
 
-        # TODO: check if reached limits
         uav_distance_to_center_of_mass = self._calculate_uav_distance_to_center_of_mass(current_state)
         if self.remaining_substeps <= 0 or uav_distance_to_center_of_mass == 0:
             done = True
