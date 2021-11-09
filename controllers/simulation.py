@@ -2,10 +2,7 @@ import controllers.host as host
 import controllers.uav as uav
 
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-import utils.location as loc
 from utils.constants import SPACE_SIZE
-
 
 def init_simulation(host_quantity=2, uav_quantity=1, **kw_args):
     simulation = {}
@@ -49,51 +46,70 @@ def calculate_center_of_mass(hosts_dict):
 
     return center_of_mass
 
-def build_hosts_rendering(hosts, x, y, labels, colors):
-    for host_index in hosts:
-        host = hosts[host_index]
-        position = host['position']
-        x.append(position['x'])
-        y.append(position['y'])
-        labels.append(host_index)
-        colors.append('black')
+class SimulationRenderer():
+    def __init__(self, simulation):
+        self._simulation = simulation
+        self._fig = plt.figure()
+        self._ax = plt.subplot(1,1,1)
+        self._reset_ax()
 
-def build_center_of_mass_rendering(center_of_mass, x, y, labels, colors):
-    x.append(center_of_mass['x'])
-    y.append(center_of_mass['y'])
-    labels.append('center_of_mass')
-    colors.append('red')
+    def _clear_lists(self):
+        self._x = list()
+        self._y = list()
+        self._labels = list()
+        self._colors = list()
 
-def build_uavs_rendering(uavs, x, y, labels, colors):
-    for uav_index in uavs:
-        uav = uavs[uav_index]
-        position = uav['position']
-        x.append(position['x'])
-        y.append(position['y'])
-        labels.append(uav_index)
-        colors.append('blue')
+    def _reset_ax(self, title=1):
+        self._clear_lists()
+        self._ax.clear()
+        self._ax.axis([0, SPACE_SIZE, 0, SPACE_SIZE])
+        self._ax.set_title(f'Simulation - {title}')
+        self._ax.set_xlabel('X')
+        self._ax.set_ylabel('Y')
 
-def render(x, y, labels, colors):
-    fig = plt.figure
-    scat = plt.scatter(x, y, color=colors)
-    for i, txt in enumerate(labels):
-        plt.annotate(txt, (x[i], y[i]))
+    def _build_hosts_rendering(self):
+        for host_index in self._simulation['hosts']:
+            host = self._simulation['hosts'][host_index]
+            position = host['position']
+            self._x.append(position['x'])
+            self._y.append(position['y'])
+            self._labels.append(host_index)
+            self._colors.append('black')
 
-    plt.axis([0, SPACE_SIZE, 0, SPACE_SIZE])
-    plt.title('Simulation')
-    plt.xlabel('X')
-    plt.ylabel('Y')
-    plt.show()
+    def _build_center_of_mass_rendering(self):
+        center_of_mass = self._simulation['center_of_mass']
+        self._x.append(center_of_mass['x'])
+        self._y.append(center_of_mass['y'])
+        self._labels.append('center_of_mass')
+        self._colors.append('red')
 
-def plot_graph(simulation):
-    x = list()
-    y = list()
-    labels = list()
-    colors = list()
+    def _build_uavs_rendering(self):
+        for uav_index in self._simulation['uavs']:
+            uav = self._simulation['uavs'][uav_index]
+            position = uav['position']
+            self._x.append(position['x'])
+            self._y.append(position['y'])
+            self._labels.append(uav_index)
+            self._colors.append('blue')
 
-    build_hosts_rendering(simulation['hosts'], x, y, labels, colors)
-    build_center_of_mass_rendering(simulation['center_of_mass'], x, y, labels, colors)
-    build_uavs_rendering(simulation['uavs'], x, y, labels, colors)
+    def _build_rendering(self, title):
+        self._reset_ax(title)
+        self._build_hosts_rendering()
+        self._build_center_of_mass_rendering()
+        self._build_uavs_rendering()
 
-    render(x, y, labels, colors)
-    plt.clf()
+    def update_uavs(self, uavs):
+        self._simulation['uavs'] = uavs
+
+    def render(self, title):
+        self._build_rendering(title)
+
+        self._ax.scatter(self._x, self._y, color=self._colors)
+        for i, txt in enumerate(self._labels):
+            self._ax.annotate(txt, (self._x[i], self._y[i]))
+
+        plt.draw()
+        plt.pause(4e-11)
+
+    def close(self):
+        plt.close(self._fig)

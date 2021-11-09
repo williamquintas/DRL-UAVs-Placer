@@ -28,17 +28,19 @@ class UAVPlacerEnv(Env):
         sim = simulation.init_simulation()
         self.state = sim
         self.remaining_substeps = number_of_substeps
+        self.renderer = simulation.SimulationRenderer(sim)
 
 
     def _get_movement_by_action(self, action):
         if ACTIONS.get(action) == 'move_up':
-            return (0.0, 0.5)
+            return (0.0, 0.1)
         elif ACTIONS.get(action) == 'move_right':
-            return (0.5, 0.0)
+            return (0.1, 0.0)
         elif ACTIONS.get(action) == 'move_down':
-            return (0.0, -0.5)
+            return (0.0, -0.1)
         elif ACTIONS.get(action) == 'move_left':
-            return (-0.5, 0.0)
+            return (-0.1, 0.0)
+        # TODO: implement actions to increase and decrease speed
 
         return (0.0, 0.0)
 
@@ -74,6 +76,7 @@ class UAVPlacerEnv(Env):
 
         uavs = current_state['uavs']
         current_state['uavs'] = self._move_all_uavs(uavs, movement)
+        self.renderer.update_uavs(current_state['uavs'])
 
         self.remaining_substeps -= 1
 
@@ -95,13 +98,15 @@ class UAVPlacerEnv(Env):
         return self.state, reward, done, info
 
 
-    # TODO: implement rendering
-    def render(self, mode):
-        pass
+    def render(self, mode, episode_number):
+        if mode == 'human':
+            self.renderer.render(f'Episode: {episode_number} - Remaining substeps: {self.remaining_substeps}')
 
 
     def reset(self):
         sim = simulation.init_simulation(hosts=self.state['hosts'])
         self.state = sim
         self.remaining_substeps = NUMBER_OF_SUBSTEPS
+        self.renderer.close()
+        self.renderer = simulation.SimulationRenderer(sim)
         return self.state
