@@ -28,7 +28,6 @@ def init_simulation(host_quantity=2, uav_quantity=1, **kw_args):
 
     return simulation
 
-
 def calculate_center_of_mass(hosts_dict):
     x_sum = 0.0
     y_sum = 0.0
