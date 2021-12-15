@@ -16,7 +16,9 @@ def calculate_distance(point1, point2):
     x2 = point2['x']
     y1 = point1['y']
     y2 = point2['y']
-    return np.linalg.norm([(x1, y1), (x2, y2)])
+    p1 = np.array((x1, y1))
+    p2 = np.array((x2, y2))
+    return np.linalg.norm(p1-p2)
 
 def check_limits(x, y, max, min=0.0):
     return x >= min and y >= min and x <= max and y <= max
