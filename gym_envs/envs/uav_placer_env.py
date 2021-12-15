@@ -6,7 +6,7 @@ from gym.spaces import Discrete, Box
 import controllers.simulation as simulation
 import controllers.uav as uav
 import utils.location as loc
-from utils.constants import BASE_SPEED, NUMBER_OF_SUBSTEPS, SPACE_SIZE
+from utils.constants import BASE_SPEED, NUMBER_OF_SUBSTEPS, PRECISION, SPACE_SIZE
 
 # Possible actions:
 #     0: Stay stopped
@@ -109,7 +109,7 @@ class UAVPlacerEnv(Env):
         reward = self._calculate_reward(current_state, self.state)
 
         uav_distance_to_center_of_mass = self._calculate_uav_distance_to_center_of_mass(current_state)
-        if self.remaining_substeps <= 0 or uav_distance_to_center_of_mass == 0:
+        if self.remaining_substeps <= 0 or uav_distance_to_center_of_mass <= PRECISION:
             done = True
         else:
             done = False
