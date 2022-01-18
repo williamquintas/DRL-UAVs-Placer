@@ -49,3 +49,6 @@ Icon
 .Trashes
 .VolumeIcon.icns
 .com.apple.timemachine.donotpresent
+
+# Project files
+data/all_buses_2014_10_03.csv
