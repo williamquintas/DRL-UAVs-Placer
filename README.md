@@ -65,6 +65,13 @@ Two scripts were declared in `Pipfile`:
 - `[simple]`: runs the simple simulation in `simple_simulation.py`. Can be called using
   `$ pipenv run simple`
 
+# Integration with Mininet-WiFi
+
+An integration with [Mininet-WiFi](https://github.com/intrig-unicamp/mininet-wifi) is being developed.
+For now, an example script was developed to place network nodes reading data from a CSV. More info can be found [here](./scripts/mininet_script)
+
+In the future, we aim to fully integrate the Deep Reinforcement Learning model developed with the Mininet-WiFi emulator and CoppeliaSim.
+
 # External References
 
 _TODO: reference article_
