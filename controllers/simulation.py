@@ -3,6 +3,8 @@ import controllers.uav as uav
 
 import matplotlib.pyplot as plt
 from utils.constants import SPACE_SIZE
+from utils.location import update_position
+
 
 def init_simulation(host_quantity=2, uav_quantity=1, **kw_args):
     simulation = {}
@@ -28,6 +30,7 @@ def init_simulation(host_quantity=2, uav_quantity=1, **kw_args):
 
     return simulation
 
+
 def calculate_center_of_mass(hosts_dict):
     x_sum = 0.0
     y_sum = 0.0
@@ -44,6 +47,26 @@ def calculate_center_of_mass(hosts_dict):
     }
 
     return center_of_mass
+
+
+def update_host_position(simulation, host):
+    if type(host) is not dict:
+        raise TypeError('Position must be a dict')
+
+    if 'hosts' not in simulation:
+        raise RuntimeError("Simulation hosts doesn\'t exist.")
+
+    index = list(host.keys())[0]
+    if index not in simulation['hosts']:
+        raise ValueError(f'{index} is not in hosts.')
+
+    hosts = simulation['hosts']
+    position = hosts[index]['position']
+    hosts[index]['position'] = update_position(position, host[index]['position'])
+    simulation['center_of_mass'] = calculate_center_of_mass(simulation['hosts'])
+
+    return simulation
+
 
 class SimulationRenderer():
     def __init__(self, simulation):
@@ -99,6 +122,9 @@ class SimulationRenderer():
 
     def update_uavs(self, uavs):
         self._simulation['uavs'] = uavs
+
+    def update_hosts(self, hosts):
+        self._simulation['hosts'] = hosts
 
     def render(self, title):
         self._build_rendering(title)

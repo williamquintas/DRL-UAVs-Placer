@@ -22,3 +22,12 @@ def calculate_distance(point1, point2):
 
 def check_limits(x, y, max, min=0.0):
     return x >= min and y >= min and x <= max and y <= max
+
+def update_position(position_object, new_position):
+    if type(position_object) is not dict:
+        raise TypeError
+
+    for coordinate in position_object.keys():
+        position_object[coordinate] = new_position[coordinate]
+
+    return position_object

@@ -29,7 +29,7 @@ def read_data(file, node):
 
         coordinates_list = []
         for index, row in enumerate(data):
-            info("Reading {} line".format(index))
+            print("Reading {} line".format(index))
             coordinate = {}
 
             for header, value in tuple(filter(filter_longitude_latitude_headers, zip(headers, row))):
