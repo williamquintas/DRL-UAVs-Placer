@@ -1,3 +1,6 @@
+import sys
+sys.path.append('.')
+
 import controllers.simulation as simulation
 import json
 
