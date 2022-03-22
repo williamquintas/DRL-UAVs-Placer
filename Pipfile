@@ -8,6 +8,7 @@ matplotlib = "*"
 numpy = "*"
 gym = "*"
 autopep8 = "*"
+pylint = "*"
 
 [dev-packages]
 
@@ -18,3 +19,4 @@ python_version = "3.9"
 main = "python main.py"
 simple = "python scripts/simple_simulation.py"
 format = "autopep8 ."
+lint = "pylint ./**/*.py && pylint ./*.py"
