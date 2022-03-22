@@ -15,4 +15,4 @@ python_version = "3.9"
 
 [scripts]
 main = "python main.py"
-simple = "python simple_simulation.py"
+simple = "python scripts/simple_simulation.py"

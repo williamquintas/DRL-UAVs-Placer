@@ -4,7 +4,7 @@ sys.path.append('.')
 import controllers.simulation as simulation
 
 sim = simulation.init_simulation(host_quantity=1, uav_quantity=1)
-renderer = simulation.SimulationRenderer(sim)
+renderer = simulation.SimulationRendererController(sim)
 
 import csv
 from itertools import islice

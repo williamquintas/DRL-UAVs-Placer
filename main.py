@@ -1,6 +1,6 @@
 import gym
 import gym_envs
-import utils.constants as const
+from utils.constants import RENDER_GRAPH, NUMBER_OF_EPISODES
 
 env = gym.make('UAV-Placer-v0')
 
@@ -12,13 +12,13 @@ def check_reward_and_repeat_action(first_reward, first_done, action):
     while (reward == 1 and not done):
         state, reward, done, info = env.step(action)
         score += reward
-        if const.RENDER_GRAPH:
+        if RENDER_GRAPH:
             env.render(episode_number=episode+1)
 
     return score
 
 
-episodes = const.NUMBER_OF_EPISODES
+episodes = NUMBER_OF_EPISODES
 scores = []
 
 for episode in range(episodes):
@@ -31,7 +31,7 @@ for episode in range(episodes):
         state, reward, done, info = env.step(action)
         score += reward
 
-        if const.RENDER_GRAPH:
+        if RENDER_GRAPH:
             env.render(episode_number=episode+1)
 
         score += check_reward_and_repeat_action(reward, done, action)

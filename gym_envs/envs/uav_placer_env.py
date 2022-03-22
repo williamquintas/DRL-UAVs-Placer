@@ -3,8 +3,8 @@ import random
 from gym import Env
 from gym.spaces import Discrete, Box
 
-import controllers.simulation as simulation
-import controllers.uav as uav
+from controllers.simulation import SimulationController, SimulationRendererController
+from controllers.uav import UAVController
 import utils.location as loc
 from utils.constants import BASE_SPEED, NUMBER_OF_SUBSTEPS, PRECISION, SPACE_SIZE
 
@@ -30,11 +30,16 @@ class UAVPlacerEnv(Env):
     def __init__(self, number_of_substeps=NUMBER_OF_SUBSTEPS):
         self.action_space = Discrete(len(ACTIONS))
         self.observation_space = Box(low=0.0, high=float(SPACE_SIZE), shape=(1,2))
-        sim = simulation.init_simulation()
-        self.state = sim
+        self.simulation = SimulationController()
         self.remaining_substeps = number_of_substeps
+        self.renderer = SimulationRendererController(self.simulation, "")
         self.speed = BASE_SPEED
-        self.renderer = simulation.SimulationRenderer(sim)
+
+        # TODO: implement a way to handle more than single UAV
+        uav = self.simulation.get_uavs()[0]
+        uav_position = uav.get_position()
+        center_of_mass = self.simulation.get_center_of_mass()
+        self.state = [center_of_mass['x'], center_of_mass['y'], uav_position['x'], uav_position['y']]
 
 
     def _get_movement_by_action(self, action):
@@ -50,25 +55,20 @@ class UAVPlacerEnv(Env):
         return (0.0, 0.0)
 
 
-    def _move_all_uavs(self, uavs, movement):
-        for uav_index in uavs:
-            uavs[uav_index] = uav.move(uavs[uav_index], *movement)
-        return uavs
+    def _move_all_uavs(self, movement):
+        for uav in self.simulation.get_uavs():
+            uav.move_position(*movement)
 
 
-    def _calculate_uav_distance_to_center_of_mass(self, state):
-        uavs = state['uavs']
-        center_of_mass = state['center_of_mass']
+    def _calculate_uav_distance_to_center_of_mass(self):
         # TODO: implement multiple UAVs scenario
-        uav_index = 'uav_0'
-        current_uav = uavs[uav_index]
-        return loc.calculate_distance(current_uav['position'], center_of_mass)
+        uav = self.simulation.get_uavs()[0]
+        center_of_mass = self.simulation.get_center_of_mass()
+
+        return loc.calculate_distance(uav.get_position(), center_of_mass)
 
 
-    def _calculate_reward(self, current_state, previous_state):
-        previous_distance = self._calculate_uav_distance_to_center_of_mass(previous_state)
-        current_distance = self._calculate_uav_distance_to_center_of_mass(current_state)
-
+    def _calculate_reward(self, current_distance, previous_distance):
         if current_distance < previous_distance:
             return 1
         elif current_distance >= previous_distance:
@@ -97,24 +97,24 @@ class UAVPlacerEnv(Env):
 
 
     def step(self, action):
-        current_state = copy.deepcopy(self.state)
-        movement = self.handle_action(action)
+        previous_distance = self._calculate_uav_distance_to_center_of_mass()
 
-        uavs = current_state['uavs']
-        current_state['uavs'] = self._move_all_uavs(uavs, movement)
-        self.renderer.update_uavs(current_state['uavs'])
+        movement = self.handle_action(action)
+        self._move_all_uavs(movement)
+        current_distance = self._calculate_uav_distance_to_center_of_mass()
 
         self.remaining_substeps -= 1
-
-        reward = self._calculate_reward(current_state, self.state)
-
-        uav_distance_to_center_of_mass = self._calculate_uav_distance_to_center_of_mass(current_state)
+        reward = self._calculate_reward(current_distance, previous_distance)
+        uav_distance_to_center_of_mass = self._calculate_uav_distance_to_center_of_mass()
         if self.remaining_substeps <= 0 or uav_distance_to_center_of_mass <= PRECISION:
             done = True
         else:
             done = False
 
-        self.state = current_state
+        uav = self.simulation.get_uavs()[0]
+        uav_position = uav.get_position()
+        center_of_mass = self.simulation.get_center_of_mass()
+        self.state = [center_of_mass['x'], center_of_mass['y'], uav_position['x'], uav_position['y']]
         info = {
             'remaining_substeps': self.remaining_substeps,
             'uav_distance_to_center_of_mass': uav_distance_to_center_of_mass,
@@ -126,13 +126,21 @@ class UAVPlacerEnv(Env):
 
     def render(self, mode, episode_number):
         if mode == 'human':
-            self.renderer.render(f'Episode: {episode_number} - Remaining substeps: {self.remaining_substeps}')
+            self.renderer.set_title(f'Episode: {episode_number} - Remaining steps: {self.remaining_substeps}')
+            self.renderer.render()
 
 
     def reset(self):
-        sim = simulation.init_simulation(hosts=self.state['hosts'])
-        self.state = sim
+        self.simulation = SimulationController()
         self.remaining_substeps = NUMBER_OF_SUBSTEPS
         self.renderer.close()
-        self.renderer = simulation.SimulationRenderer(sim)
+        self.renderer = SimulationRendererController(self.simulation, "")
+        self.speed = BASE_SPEED
+
+        # TODO: implement a way to handle more than single UAV
+        uav = self.simulation.get_uavs()[0]
+        uav_position = uav.get_position()
+        center_of_mass = self.simulation.get_center_of_mass()
+        self.state = [center_of_mass['x'], center_of_mass['y'], uav_position['x'], uav_position['y']]
+
         return self.state
