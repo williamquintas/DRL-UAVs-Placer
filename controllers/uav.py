@@ -1,21 +1,26 @@
-import utils.location as loc
-import utils.constants as const
+from utils.location import check_limits
+from utils.constants import SPACE_SIZE
 
-def build_uav():
-    uav = {}
 
-    position = loc.generate_random_position(const.SPACE_SIZE)
-    uav['position'] = position
+class UAVController:
+    def __init__(self, id, position):
+        if not isinstance(position, dict):
+            raise TypeError(
+                "position must be a dict { 'x': float, 'y': float }")
+        else:
+            self.id = id
+            self.position = position
 
-    return uav
+    def get_id(self):
+        return self.id
 
-def move(uav, x_step, y_step):
-    position = uav['position']
-    new_x = position['x'] + x_step
-    new_y = position['y'] + y_step
+    def get_position(self):
+        return self.position
 
-    if loc.check_limits(new_x, new_y, float(const.SPACE_SIZE)):
-        position['x'] = new_x
-        position['y'] = new_y
+    def move_position(self, x_step, y_step):
+        new_x = self.position['x'] + x_step
+        new_y = self.position['y'] + y_step
 
-    return uav
+        if check_limits(new_x, new_y, float(SPACE_SIZE)):
+            self.position['x'] = new_x
+            self.position['y'] = new_y

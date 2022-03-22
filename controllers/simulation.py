@@ -1,79 +1,73 @@
-import controllers.host as host
-import controllers.uav as uav
-
+import json
 import matplotlib.pyplot as plt
+
+from controllers.host import HostController
+from controllers.uav import UAVController
 from utils.constants import SPACE_SIZE
-from utils.location import update_position
+from utils.location import update_position, generate_random_position
 
 
-def init_simulation(host_quantity=2, uav_quantity=1, **kw_args):
-    simulation = {}
-    hosts_dict = {}
-    uavs_dict = {}
+class SimulationController:
+    def __init__(self, host_quantity=2, uav_quantity=1, **kw_args):
+        self._hosts = []
+        self._uavs = []
+        self._center_of_mass = None
 
-    if 'hosts' in kw_args:
-        simulation['hosts'] = kw_args['hosts']
-    else:
-        for host_index in range(host_quantity):
-            hosts_dict.update({
-                f'host_{host_index}': host.build_host()
-            })
-        simulation['hosts'] = hosts_dict
+        if 'hosts' in kw_args:
+            self._hosts = kw_args['hosts']
+        else:
+            for host_index in range(host_quantity):
+                position = generate_random_position(SPACE_SIZE)
+                new_host = HostController(f'host_{host_index}', position)
+                self._hosts.append(new_host)
 
-    for uav_index in range(uav_quantity):
-        uavs_dict.update({
-            f'uav_{uav_index}': uav.build_uav()
-        })
+        for uav_index in range(uav_quantity):
+            position = generate_random_position(SPACE_SIZE)
+            new_uav = UAVController(f'uav_{uav_index}', position)
+            self._uavs.append(new_uav)
 
-    simulation['uavs'] = uavs_dict
-    simulation['center_of_mass'] = calculate_center_of_mass(simulation['hosts'])
+        self._calculate_center_of_mass()
 
-    return simulation
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__,
+                          sort_keys=True, indent=2)
 
+    def get_hosts(self):
+        return self._hosts
 
-def calculate_center_of_mass(hosts_dict):
-    x_sum = 0.0
-    y_sum = 0.0
+    def get_uavs(self):
+        return self._uavs
 
-    for host_index in hosts_dict:
-        host = hosts_dict[host_index]
-        position = host['position']
-        x_sum += position['x']
-        y_sum += position['y']
+    def get_center_of_mass(self):
+        self._calculate_center_of_mass()
+        return self._center_of_mass
 
-    center_of_mass = {
-        'x': round(x_sum/len(hosts_dict), 2),
-        'y': round(y_sum/len(hosts_dict), 2)
-    }
+    def _calculate_center_of_mass(self):
+        x_sum = 0.0
+        y_sum = 0.0
+        hosts_quantity = len(self._hosts)
 
-    return center_of_mass
+        for host in self.get_hosts():
+            position = host.get_position()
+            x_sum += position['x']
+            y_sum += position['y']
 
-
-def update_host_position(simulation, host):
-    if type(host) is not dict:
-        raise TypeError('Position must be a dict')
-
-    if 'hosts' not in simulation:
-        raise RuntimeError("Simulation hosts doesn\'t exist.")
-
-    index = list(host.keys())[0]
-    if index not in simulation['hosts']:
-        raise ValueError(f'{index} is not in hosts.')
-
-    hosts = simulation['hosts']
-    position = hosts[index]['position']
-    hosts[index]['position'] = update_position(position, host[index]['position'])
-    simulation['center_of_mass'] = calculate_center_of_mass(simulation['hosts'])
-
-    return simulation
+        self._center_of_mass = {
+            'x': round(x_sum / hosts_quantity, 2),
+            'y': round(y_sum / hosts_quantity, 2)
+        }
 
 
-class SimulationRenderer():
-    def __init__(self, simulation):
+class SimulationRendererController():
+    def __init__(self, simulation, title):
         self._simulation = simulation
+        self._title = title
         self._fig = plt.figure()
-        self._ax = plt.subplot(1,1,1)
+        self._ax = plt.subplot(1, 1, 1)
         self._reset_ax()
+
+    def set_title(self, title):
+        self._title = title
 
     def _clear_lists(self):
         self._x = list()
@@ -85,49 +79,41 @@ class SimulationRenderer():
         self._clear_lists()
         self._ax.clear()
         self._ax.axis([0, SPACE_SIZE, 0, SPACE_SIZE])
-        self._ax.set_title(f'Simulation - {title}')
+        self._ax.set_title(f'Simulation - {self._title}')
         self._ax.set_xlabel('X')
         self._ax.set_ylabel('Y')
 
-    def _build_hosts_rendering(self):
-        for host_index in self._simulation['hosts']:
-            host = self._simulation['hosts'][host_index]
-            position = host['position']
-            self._x.append(position['x'])
-            self._y.append(position['y'])
-            self._labels.append(host_index)
-            self._colors.append('black')
-
     def _build_center_of_mass_rendering(self):
-        center_of_mass = self._simulation['center_of_mass']
+        center_of_mass = self._simulation.get_center_of_mass()
         self._x.append(center_of_mass['x'])
         self._y.append(center_of_mass['y'])
         self._labels.append('center_of_mass')
         self._colors.append('red')
 
-    def _build_uavs_rendering(self):
-        for uav_index in self._simulation['uavs']:
-            uav = self._simulation['uavs'][uav_index]
-            position = uav['position']
+    def _build_hosts_rendering(self):
+        for host in self._simulation.get_hosts():
+            position = host.get_position()
             self._x.append(position['x'])
             self._y.append(position['y'])
-            self._labels.append(uav_index)
+            self._labels.append(host.get_id())
+            self._colors.append('black')
+
+    def _build_uavs_rendering(self):
+        for uav in self._simulation.get_uavs():
+            position = uav.get_position()
+            self._x.append(position['x'])
+            self._y.append(position['y'])
+            self._labels.append(uav.get_id())
             self._colors.append('blue')
 
-    def _build_rendering(self, title):
-        self._reset_ax(title)
+    def _build_rendering(self):
+        self._reset_ax()
         self._build_hosts_rendering()
         self._build_center_of_mass_rendering()
         self._build_uavs_rendering()
 
-    def update_uavs(self, uavs):
-        self._simulation['uavs'] = uavs
-
-    def update_hosts(self, hosts):
-        self._simulation['hosts'] = hosts
-
-    def render(self, title):
-        self._build_rendering(title)
+    def render(self):
+        self._build_rendering()
 
         self._ax.scatter(self._x, self._y, color=self._colors)
         for i, txt in enumerate(self._labels):

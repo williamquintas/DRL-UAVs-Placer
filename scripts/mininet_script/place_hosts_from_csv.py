@@ -12,8 +12,8 @@ from mn_wifi.net import Mininet_wifi
 from mn_wifi.telemetry import telemetry
 from mn_wifi.wmediumdConnector import interference
 
-def topology():
 
+def topology():
     "Create a network."
     net = Mininet_wifi(link=wmediumd, wmediumd_mode=interference)
 
@@ -49,7 +49,8 @@ def topology():
 
     info("*** Configure the node position\n")
     path = os.path.dirname(os.path.abspath(__file__))
-    setNodePosition = 'python {}/setNodePosition.py {} &'.format(path, sta_drone_send)
+    setNodePosition = 'python {}/setNodePosition.py {} &'.format(
+        path, sta_drone_send)
     os.system(setNodePosition)
 
     info("*** Running CLI\n")
@@ -59,9 +60,11 @@ def topology():
     kill_process()
     net.stop()
 
+
 def kill_process():
     os.system('pkill -9 -f setNodePosition.py')
     # os.system('rm examples/csv/data/*')
+
 
 if __name__ == '__main__':
     setLogLevel('info')
