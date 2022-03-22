@@ -8,6 +8,7 @@ import os
 
 from mininet.log import info
 
+
 def client(message):
     host = '127.0.0.1'
     port = 12345  # Make sure it's within the > 1024 $$ <65535 range
@@ -18,8 +19,10 @@ def client(message):
     info('Received from server: ' + data)
     s.close()
 
-filter_longitude_latitude_headers = lambda column: column[0] == 'latitude' \
-                                                or column[0] == 'longitude'
+
+def filter_longitude_latitude_headers(column): return column[0] == 'latitude' \
+    or column[0] == 'longitude'
+
 
 def read_data(file, node):
     with open(file, 'r') as csv_file:
@@ -32,16 +35,19 @@ def read_data(file, node):
             print("Reading {} line".format(index))
             coordinate = {}
 
-            for header, value in tuple(filter(filter_longitude_latitude_headers, zip(headers, row))):
-                coordinate[header]= value
-                
+            for header, value in tuple(
+                    filter(filter_longitude_latitude_headers, zip(headers, row))):
+                coordinate[header] = value
+
             coordinates_list.append(coordinate)
 
         for coordinate in coordinates_list:
-            command = "set.{}.setPosition(\"{},{},0.0\")".format(node, str(coordinate['longitude']), str(coordinate['latitude']))
+            command = "set.{}.setPosition(\"{},{},0.0\")".format(
+                node, str(coordinate['longitude']), str(coordinate['latitude']))
             client(command)
             time.sleep(0.5)
-    
+
+
 if __name__ == '__main__':
     nodes = []
     files = []

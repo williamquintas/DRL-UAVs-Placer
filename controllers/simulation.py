@@ -28,23 +28,19 @@ class SimulationController:
 
         self._calculate_center_of_mass()
 
-
     def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=2)
-
+        return json.dumps(self, default=lambda o: o.__dict__,
+                          sort_keys=True, indent=2)
 
     def get_hosts(self):
         return self._hosts
 
-
     def get_uavs(self):
         return self._uavs
-
 
     def get_center_of_mass(self):
         self._calculate_center_of_mass()
         return self._center_of_mass
-
 
     def _calculate_center_of_mass(self):
         x_sum = 0.0
@@ -57,8 +53,8 @@ class SimulationController:
             y_sum += position['y']
 
         self._center_of_mass = {
-            'x': round(x_sum/hosts_quantity, 2),
-            'y': round(y_sum/hosts_quantity, 2)
+            'x': round(x_sum / hosts_quantity, 2),
+            'y': round(y_sum / hosts_quantity, 2)
         }
 
 
@@ -67,7 +63,7 @@ class SimulationRendererController():
         self._simulation = simulation
         self._title = title
         self._fig = plt.figure()
-        self._ax = plt.subplot(1,1,1)
+        self._ax = plt.subplot(1, 1, 1)
         self._reset_ax()
 
     def set_title(self, title):
