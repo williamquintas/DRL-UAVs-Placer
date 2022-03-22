@@ -17,4 +17,4 @@ python_version = "3.9"
 [scripts]
 main = "python main.py"
 simple = "python scripts/simple_simulation.py"
-format = "autopep8 --in-place --aggressive --recursive ."
+format = "autopep8 ."
