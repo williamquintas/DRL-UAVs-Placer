@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from controllers.host import HostController
 from controllers.uav import UAVController
 from utils.constants import SPACE_SIZE
-from utils.location import update_position, generate_random_position
+from utils.location import generate_random_position
 
 
 class SimulationController:
@@ -28,7 +28,7 @@ class SimulationController:
 
         self._calculate_center_of_mass()
 
-    def toJSON(self):
+    def to_json(self):
         return json.dumps(self, default=lambda o: o.__dict__,
                           sort_keys=True, indent=2)
 
@@ -62,6 +62,12 @@ class SimulationRendererController():
     def __init__(self, simulation, title):
         self._simulation = simulation
         self._title = title
+        self._data = {
+            'x': [],
+            'y': [],
+            'labels': [],
+            'colors': []
+        }
         self._fig = plt.figure()
         self._ax = plt.subplot(1, 1, 1)
         self._reset_ax()
@@ -70,12 +76,12 @@ class SimulationRendererController():
         self._title = title
 
     def _clear_lists(self):
-        self._x = list()
-        self._y = list()
-        self._labels = list()
-        self._colors = list()
+        self._data['x'] = []
+        self._data['y'] = []
+        self._data['labels'] = []
+        self._data['colors'] = []
 
-    def _reset_ax(self, title=1):
+    def _reset_ax(self):
         self._clear_lists()
         self._ax.clear()
         self._ax.axis([0, SPACE_SIZE, 0, SPACE_SIZE])
@@ -85,26 +91,26 @@ class SimulationRendererController():
 
     def _build_center_of_mass_rendering(self):
         center_of_mass = self._simulation.get_center_of_mass()
-        self._x.append(center_of_mass['x'])
-        self._y.append(center_of_mass['y'])
-        self._labels.append('center_of_mass')
-        self._colors.append('red')
+        self._data['x'].append(center_of_mass['x'])
+        self._data['y'].append(center_of_mass['y'])
+        self._data['labels'].append('center_of_mass')
+        self._data['colors'].append('red')
 
     def _build_hosts_rendering(self):
         for host in self._simulation.get_hosts():
             position = host.get_position()
-            self._x.append(position['x'])
-            self._y.append(position['y'])
-            self._labels.append(host.get_id())
-            self._colors.append('black')
+            self._data['x'].append(position['x'])
+            self._data['y'].append(position['y'])
+            self._data['labels'].append(host.get_id())
+            self._data['colors'].append('black')
 
     def _build_uavs_rendering(self):
         for uav in self._simulation.get_uavs():
             position = uav.get_position()
-            self._x.append(position['x'])
-            self._y.append(position['y'])
-            self._labels.append(uav.get_id())
-            self._colors.append('blue')
+            self._data['x'].append(position['x'])
+            self._data['y'].append(position['y'])
+            self._data['labels'].append(uav.get_id())
+            self._data['colors'].append('blue')
 
     def _build_rendering(self):
         self._reset_ax()
@@ -115,9 +121,9 @@ class SimulationRendererController():
     def render(self):
         self._build_rendering()
 
-        self._ax.scatter(self._x, self._y, color=self._colors)
-        for i, txt in enumerate(self._labels):
-            self._ax.annotate(txt, (self._x[i], self._y[i]))
+        self._ax.scatter(self._data['x'], self._data['y'], color=self._data['colors'])
+        for i, txt in enumerate(self._data['labels']):
+            self._ax.annotate(txt, (self._data['x'][i], self._data['y'][i]))
 
         plt.draw()
         plt.pause(4e-11)
