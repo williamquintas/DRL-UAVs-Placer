@@ -1,5 +1,5 @@
-import numpy as np
 import random
+import numpy as np
 
 # comment the line below to generate different random numbers
 random.seed(1)
@@ -14,17 +14,13 @@ def generate_random_position(max_value=10):
 
 
 def calculate_distance(point1, point2):
-    x1 = point1['x']
-    x2 = point2['x']
-    y1 = point1['y']
-    y2 = point2['y']
-    p1 = np.array((x1, y1))
-    p2 = np.array((x2, y2))
-    return np.linalg.norm(p1 - p2)
+    p1_as_arr = np.array((point1['x'], point1['y']))
+    p2_as_arr = np.array((point2['x'], point2['y']))
+    return np.linalg.norm(p1_as_arr - p2_as_arr)
 
 
-def check_limits(x, y, max, min=0.0):
-    return x >= min and y >= min and x <= max and y <= max
+def check_limits(pos_x, pos_y, max_value, min_value=0.0):
+    return min_value <= pos_x <= max_value and min_value <= pos_y <= max_value
 
 
 def update_position(position_object, new_position):
