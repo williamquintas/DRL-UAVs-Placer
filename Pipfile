@@ -4,8 +4,19 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+matplotlib = "*"
+numpy = "*"
+gym = "*"
+autopep8 = "*"
+pylint = "*"
 
 [dev-packages]
 
 [requires]
 python_version = "3.9"
+
+[scripts]
+main = "python main.py"
+simple = "python scripts/simple_simulation.py"
+format = "autopep8 ."
+lint = "pylint ./**/*.py && pylint ./*.py"
