@@ -18,12 +18,15 @@ class SimulationController:
         else:
             for host_index in range(host_quantity):
                 position = generate_random_position(SPACE_SIZE)
-                new_host = HostController(f'host_{host_index}', position)
+                id = kw_args['hosts_names'][host_index] \
+                    if 'hosts_names' in kw_args \
+                    else "host_{}".format(host_index)
+                new_host = HostController(id, position)
                 self._hosts.append(new_host)
 
         for uav_index in range(uav_quantity):
             position = generate_random_position(SPACE_SIZE)
-            new_uav = UAVController(f'uav_{uav_index}', position)
+            new_uav = UAVController("uav_{}".format(uav_index), position)
             self._uavs.append(new_uav)
 
         self._calculate_center_of_mass()
@@ -85,7 +88,7 @@ class SimulationRendererController():
         self._clear_lists()
         self._ax.clear()
         self._ax.axis([0, SPACE_SIZE, 0, SPACE_SIZE])
-        self._ax.set_title(f'Simulation - {self._title}')
+        self._ax.set_title("Simulation - {}".format(self._title))
         self._ax.set_xlabel('X')
         self._ax.set_ylabel('Y')
 
