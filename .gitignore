@@ -56,3 +56,6 @@ data/all_buses_2014_10_03.csv
 data/output/*.csv
 scripts/uav/*
 pylint.out
+
+#Build files
+mininet_integration/dist
