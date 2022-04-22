@@ -130,7 +130,7 @@ class UAVPlacerEnv(Env):
     def render(self, mode, episode_number):
         if mode == 'human':
             self.renderer.set_title(
-                f'Episode: {episode_number} - Remaining steps: {self.remaining_substeps}')
+                "Episode: {} - Remaining steps: {}".format(episode_number, self.remaining_substeps))
             self.renderer.render()
 
     def reset(self):

@@ -9,11 +9,12 @@ numpy = "*"
 gym = "*"
 autopep8 = "*"
 pylint = "*"
+3to2 = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.9"
+python_version = "*"
 
 [scripts]
 main = "python main.py"
