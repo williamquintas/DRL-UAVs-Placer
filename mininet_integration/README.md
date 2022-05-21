@@ -1,4 +1,4 @@
-# Mininet Script
+# Mininet Integration
 
 This script was developed with the aim to integrate the built simulation with Mininet Wifi. It reads the already preprocessed data on CSV files containing buses informations (such as latitude and longitude) and send it to both Mininet Wifi and Simulation.
 
