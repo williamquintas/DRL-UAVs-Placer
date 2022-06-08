@@ -27,24 +27,27 @@ def create_topology() -> Mininet_wifi:
     net = Mininet_wifi(link=wmediumd, wmediumd_mode=interference)
 
     print("*** Creating nodes\n")
+    uav1 = net.addAccessPoint('uav1', ssid='uav1', mode='g', channel='5',
+                             position='5,5,0')
     vehicle1 = net.addStation('vehicle1', mac='00:00:00:00:00:01', ip='10.0.0.1/8',
                               position='0,0,0')
     vehicle2 = net.addStation('vehicle2', mac='00:00:00:00:00:02', ip='10.0.0.2/8',
                               position='10,10,0')
-    net.setPropagationModel(model="logDistance", exp=4.5)
+    h1 = net.addHost('h1', mac='00:00:00:00:00:03', ip='10.0.0.3/8')
+
+    net.setPropagationModel(model="logDistance", exp=1.5)
 
     print("*** Configuring wifi nodes\n")
     net.configureWifiNodes()
 
-    net.addLink(vehicle1, cls=adhoc, intf='vehicle1-wlan0',
-                ssid='adhocNet', proto='batman_adv',
-                mode='g', channel=5, ht_cap='HT40+')
-    net.addLink(vehicle2, cls=adhoc, intf='vehicle2-wlan0',
-                ssid='adhocNet', proto='batman_adv',
-                mode='g', channel=5, ht_cap='HT40+')
+    print("*** Associating Stations\n")
+    net.addLink(vehicle1, uav1)
+    net.addLink(vehicle2, uav1)
+    net.addLink(h1, uav1)
 
     print("*** Starting network\n")
     net.build()
+    uav1.start([])
 
     print("*** Starting Socket Server\n")
     net.socketServer(ip='127.0.0.1', port=MININET_SOCKET_PORT)
