@@ -63,6 +63,10 @@ def create_topology() -> Mininet_wifi:
     run_command("build_simulation", stations_names_str)
     time.sleep(1) # Required to wait simulation run before receiving commands
     run_command("set_vehicles_positions", stations_names_str)
+    
+    print("*** Start vehicles periodic functions\n")
+    vehicle1.cmd("python vehicles_periodic_function.py &")
+    vehicle2.cmd("python vehicles_periodic_function.py &")
 
     return net
 
