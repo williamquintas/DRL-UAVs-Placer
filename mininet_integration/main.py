@@ -27,13 +27,11 @@ def create_topology() -> Mininet_wifi:
     net = Mininet_wifi(link=wmediumd, wmediumd_mode=interference)
 
     print("*** Creating nodes\n")
-    uav1 = net.addAccessPoint('uav1', ssid='uav1', mode='g', channel='5',
-                             position='5,5,0')
-    vehicle1 = net.addStation('vehicle1', mac='00:00:00:00:00:01', ip='10.0.0.1/8',
-                              position='0,0,0')
-    vehicle2 = net.addStation('vehicle2', mac='00:00:00:00:00:02', ip='10.0.0.2/8',
-                              position='10,10,0')
-    h1 = net.addHost('h1', mac='00:00:00:00:00:03', ip='10.0.0.3/8')
+    uav1 = net.addAccessPoint('uav1', ssid='uav1', mode='g', channel='5')
+    vehicle1 = net.addStation('vehicle1', mac='00:00:00:00:00:01', ip='10.0.0.1/8')
+    vehicle2 = net.addStation('vehicle2', mac='00:00:00:00:00:02', ip='10.0.0.2/8')
+    server = net.addHost('server', mac='00:00:00:00:00:03', ip='10.0.0.3/8')
+    c0 = net.addController('c0')
 
     net.setPropagationModel(model="logDistance", exp=1.5)
 
@@ -43,11 +41,16 @@ def create_topology() -> Mininet_wifi:
     print("*** Associating Stations\n")
     net.addLink(vehicle1, uav1)
     net.addLink(vehicle2, uav1)
-    net.addLink(h1, uav1)
+    net.addLink(server, uav1)
 
     print("*** Starting network\n")
     net.build()
-    uav1.start([])
+    c0.start()
+    uav1.start([c0])
+
+    print("*** Creating files on server\n")
+    for file_size in [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]:
+        server.cmd("truncate -s {file_size}M /{file_size}M-file.txt".format(file_size=file_size))
 
     print("*** Starting Socket Server\n")
     net.socketServer(ip='127.0.0.1', port=MININET_SOCKET_PORT)
