@@ -1,16 +1,26 @@
-from random import Random, random
-import threading, random
+import os, random, threading
+
+from utils.constants import FILES_SIZES
 
 WAIT_SECONDS = 1
+SERVER_ADDRESS = "10.0.0.3"
+PATH = os.path.dirname(os.path.abspath(__file__))
 
 def should_get_file():
-    return random.random() >= 0.9
+    return random.random() >= 0.5
 
 def get_file():
     if should_get_file():
-        file_size = random.choice([2, 4, 8, 16, 32, 64, 128, 256, 512, 1024])
-        #TODO: implement get_file logic
+        file_size = random.choice(FILES_SIZES)
+        filename = "{}K-file.txt".format(file_size)
+
+        print("Downloading {}K-file.txt".format(filename))
+        os.system("wget -O {path}/downloaded_files/{filename} {address}/{filename} &".format(path=PATH, address=SERVER_ADDRESS, filename=filename))
+
+    else:
+        print("Not getting files this time.")
 
     threading.Timer(WAIT_SECONDS, get_file).start()
-    
-get_file()
+
+if __name__ == '__main__':
+    get_file()
