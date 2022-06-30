@@ -66,8 +66,8 @@ def create_topology() -> Mininet_wifi:
     
     print("*** Start vehicles periodic functions\n")
     os.system("mkdir {}/downloaded_files".format(PATH))
-    vehicle1.cmd("python vehicles_periodic_function.py &")
-    vehicle2.cmd("python vehicles_periodic_function.py &")
+    vehicle1.cmd("python vehicles_periodic_function.py vehicle1 &")
+    vehicle2.cmd("python vehicles_periodic_function.py vehicle2 &")
 
     return net
 
