@@ -8,6 +8,7 @@ from mn_wifi.net import Mininet_wifi
 from mn_wifi.wmediumdConnector import interference
 from utils.constants import MININET_SOCKET_PORT
 
+PATH = os.path.dirname(os.path.abspath(__file__))
 
 def kill_command(filename: str) -> None:
     path = os.path.dirname(os.path.abspath(__file__))
@@ -49,8 +50,7 @@ def create_topology() -> Mininet_wifi:
     uav1.start([c0])
 
     print("*** Creating files on server\n")
-    for file_size in [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]:
-        server.cmd("truncate -s {file_size}M /{file_size}M-file.txt".format(file_size=file_size))
+    server.cmd("python start_server.py &")
 
     print("*** Starting Socket Server\n")
     net.socketServer(ip='127.0.0.1', port=MININET_SOCKET_PORT)
@@ -65,6 +65,7 @@ def create_topology() -> Mininet_wifi:
     run_command("set_vehicles_positions", stations_names_str)
     
     print("*** Start vehicles periodic functions\n")
+    os.system("mkdir {}/downloaded_files".format(PATH))
     vehicle1.cmd("python vehicles_periodic_function.py &")
     vehicle2.cmd("python vehicles_periodic_function.py &")
 
@@ -83,4 +84,8 @@ if __name__ == '__main__':
     print("*** Stopping network\n")
     kill_command("set_vehicles_positions")
     kill_command("build_simulation")
+    os.system('pkill -9 -f {}/vehicles_periodic_function.py'.format(PATH))
+    os.system('pkill -9 -f {}/start_server.py'.format(PATH))
+    os.system("rm -rf {path}/*.txt {path}/downloaded_files".format(path=PATH))
+
     net.stop()
