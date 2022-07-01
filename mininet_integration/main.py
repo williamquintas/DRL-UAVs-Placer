@@ -63,11 +63,14 @@ def create_topology() -> Mininet_wifi:
     run_command("build_simulation", stations_names_str)
     time.sleep(1) # Required to wait simulation run before receiving commands
     run_command("set_vehicles_positions", stations_names_str)
-    
+
     print("*** Start vehicles periodic functions\n")
     os.system("mkdir {}/downloaded_files".format(PATH))
-    vehicle1.cmd("python vehicles_periodic_function.py vehicle1 &")
-    vehicle2.cmd("python vehicles_periodic_function.py vehicle2 &")
+    vehicle1.cmd("python download_files.py &")
+    vehicle2.cmd("python download_files.py &")
+    vehicle1.cmd("python measure_rx_tx.py vehicle1 &")
+    vehicle2.cmd("python measure_rx_tx.py vehicle2 &")
+    run_command("set_vehicles_rx_tx", stations_names_str)
 
     return net
 
@@ -84,8 +87,10 @@ if __name__ == '__main__':
     print("*** Stopping network\n")
     kill_command("set_vehicles_positions")
     kill_command("build_simulation")
-    os.system('pkill -9 -f {}/vehicles_periodic_function.py'.format(PATH))
+    kill_command("set_vehicles_rx_tx")
+    os.system('pkill -9 -f {}/download_files.py'.format(PATH))
+    os.system('pkill -9 -f {}/measure_rx_tx.py'.format(PATH))
     os.system('pkill -9 -f {}/start_server.py'.format(PATH))
-    os.system("rm -rf {path}/*.txt {path}/downloaded_files".format(path=PATH))
+    os.system("rm -rf {path}/*.txt {path}/*.dat {path}/downloaded_files".format(path=PATH))
 
     net.stop()
