@@ -7,7 +7,8 @@ import sys
 sys.path.append('.')
 
 SET_POSITION = "set_position"
-COMMANDS = [SET_POSITION]
+SET_RX_TX = "set_rx_tx"
+COMMANDS = [SET_POSITION, SET_RX_TX]
 
 
 class SimulationRunner:
@@ -32,10 +33,23 @@ class SimulationRunner:
             print("No host found with id {}.".format(hostname))
         self._renderer.render()
 
+    def _process_set_rx_tx(self, hostname: str, **kwargs):
+        hosts = self._simulation.get_hosts()
+        host = list(filter(lambda h: h.get_id() == hostname, hosts))
+        if(host):
+            host[0].append_data_communicated_list(rx=kwargs['rx'], tx=kwargs['tx'])
+        else:
+            print("No host found with id {}.".format(hostname))
+        self._renderer.render()
+
     def _process_command(self, command: str, hostname: str, *args) -> None:
         if command == SET_POSITION:
             coordinates = list(map(float, args[0]))
             self._process_set_position(hostname, x=coordinates[0], y=coordinates[1])
+        elif command == SET_RX_TX:
+            rx_tx = list(map(float, args[0]))
+            print(rx_tx)
+            self._process_set_rx_tx(hostname, rx=rx_tx[0], tx=rx_tx[1])
         else:
             print("Command {} is not known. \n Accepted commands: {}".format(
                 command,
