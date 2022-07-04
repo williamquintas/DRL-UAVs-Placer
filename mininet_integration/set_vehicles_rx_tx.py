@@ -46,12 +46,3 @@ if __name__ == '__main__':
     else:
         time.sleep(1) # Required to wait files to be created
         read_files()
-
-# import time
-# from socket import socket, AF_INET, SOCK_STREAM
-# time.sleep(5) # Required to wait files to be created
-# message = ["0,1","2,3","4,5"]
-# client = socket(AF_INET, SOCK_STREAM)
-# client.connect(('127.0.0.1', 10001))
-# client.send(str(message).encode('utf-8'))
-# client.close()

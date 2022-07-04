@@ -75,13 +75,13 @@ if __name__ == '__main__':
         for coordinate in data_list:
             command = "set.{}.setPosition(\"{},{},0.0\")"\
                 .format(coordinate['vehicle'],
-                        str(float(coordinate['longitude']) / 10.0),
-                        str(float(coordinate['latitude']) / 10.0)
+                        str(coordinate['longitude']),
+                        str(coordinate['latitude'])
                         )
             send_command_to_mininet_socket(command)
             command = "{} set_position {} {}" \
                 .format(coordinate['vehicle'],
-                        str(float(coordinate['longitude']) / 10.0),
-                        str(float(coordinate['latitude']) / 10.0)
+                        str(coordinate['longitude']),
+                        str(coordinate['latitude'])
                         )
             send_command_to_simulation(command)
