@@ -40,6 +40,9 @@ This repository files are structured as follows:
 |   |── host.py
 |   |── simulation.py
 |   |── uav.py
+|── data
+|── mininet_simulations
+|── scripts
 |── gym_envs
 |   |── envs
 |   |   |── uav_placer_env.py
@@ -55,6 +58,7 @@ This repository files are structured as follows:
 - `utils`: folder containing utils files. It is a good practice to group functions of different entities in different utils files.
 - `main.py`: main file of the repository, contains the Open AI Gym environment declaration and runs simulation (see in the section above how to run it using scripts).
 - `simple_simulation.py`: file that creates a simulation without running Open AI Gym, can be used to simply see Hosts and UAVs properties (see in the section above how to run it using scripts).
+  _TODO: describe new directories_
 
 # Scripts
 
@@ -71,6 +75,7 @@ An integration with [Mininet-WiFi](https://github.com/intrig-unicamp/mininet-wif
 For now, an example script was developed to place network nodes reading data from a CSV. More info can be found [here](./scripts/mininet_script)
 
 In the future, we aim to fully integrate the Deep Reinforcement Learning model developed with the Mininet-WiFi emulator and CoppeliaSim.
+_TODO: link to mn_wifi simulations directory_
 
 # External References
 

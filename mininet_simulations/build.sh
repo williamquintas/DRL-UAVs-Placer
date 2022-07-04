@@ -2,7 +2,7 @@
 rm -rf dist
 mkdir dist
 
-cp -R ../controllers ../gym_envs ../utils ./data ../Pipfile ./*.py ./deploy.sh ./dist
+cp -R ../controllers ../gym_envs ../utils ./data ../Pipfile ./**/*.py ./deploy.sh ./dist
 
 pipenv run 3to2 dist -w -n --no-diffs
 
