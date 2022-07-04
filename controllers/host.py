@@ -36,8 +36,13 @@ class HostController:
     def get_position(self):
         return self._position
 
-    def get_data_communicated_list(self):
-        return self._data_communicated_list
+    def get_avg_data_communicated_per_second(self):
+        data_communicated_sum = 0.0
+
+        for data_communicated in self._data_communicated_list:
+            data_communicated_sum += (data_communicated[0] + data_communicated[1])
+
+        return data_communicated_sum / DATA_COMMUNICATED_LIST_SIZE
 
     def set_position(self, position):
         self._position = position
