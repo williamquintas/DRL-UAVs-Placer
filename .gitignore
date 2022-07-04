@@ -60,3 +60,5 @@ pylint.out
 
 #Build files
 mininet_integration/dist
+
+data/buses_data/

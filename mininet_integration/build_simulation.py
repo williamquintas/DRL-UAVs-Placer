@@ -1,9 +1,11 @@
 #!/usr/bin/python
 from utils.constants import SIMULATION_SOCKET_PORT
+from utils.print import log
 from controllers.simulation import SimulationController, SimulationRendererController
 import socket
 import sys
 import threading
+
 
 sys.path.append('.')
 
@@ -22,7 +24,7 @@ class SimulationRunner:
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.bind((host, port))
         server.listen(1)
-        print("Simulation socket listening on {}:{}\n".format(host, port))
+        log("Simulation socket listening on {}:{}\n".format(host, port))
         return server
 
     def _process_set_position(self, hostname: str, **kwargs):
@@ -31,7 +33,7 @@ class SimulationRunner:
         if(host):
             host[0].set_position(kwargs)
         else:
-            print("No host found with id {}.".format(hostname))
+            log("No host found with id {}.".format(hostname))
         self._renderer.render()
 
     def _process_set_rx_tx(self, hostname: str, data_list: list):
@@ -40,7 +42,7 @@ class SimulationRunner:
         if(host):
             host[0].set_data_communicated_list(data_list)
         else:
-            print("No host found with id {}.".format(hostname))
+            log("No host found with id {}.".format(hostname))
         self._renderer.render()
 
     def _process_command(self, command: str, hostname: str, *args) -> None:
@@ -51,7 +53,7 @@ class SimulationRunner:
             data_list = args[0]
             self._process_set_rx_tx(hostname, data_list)
         else:
-            print("Command {} is not known. \n Accepted commands: {}".format(
+            log("Command {} is not known. \n Accepted commands: {}".format(
                 command,
                 ", ".join(COMMANDS)
             ))
@@ -78,9 +80,9 @@ class SimulationRunner:
 
 if __name__ == '__main__':
     if len(sys.argv) <= 1:
-        print("No vehicles names passed in arguments. \n")
+        log("No vehicles names passed in arguments. \n")
         sys.exit()
     else:
-        print("*** Running Simulation\n")
+        log("*** Running Simulation\n")
         simulation_runner = SimulationRunner(sys.argv[1:])
         simulation_runner.receive_data_on_server()

@@ -6,6 +6,7 @@ import sys
 import time
 
 from utils.constants import SIMULATION_SOCKET_PORT, MININET_SOCKET_PORT
+from utils.print import log
 
 
 def build_client(port: int) -> socket:
@@ -61,17 +62,17 @@ def read_data_from_csv(vehicle_name: str, coordinates_list: str) -> list:
 
 if __name__ == '__main__':
     if len(sys.argv) <= 1:
-        print("No vehicles passed in arguments. \n")
+        log("No vehicles passed in arguments. \n")
         sys.exit()
     else:
         data_list = []
         for n in range(1, len(sys.argv)):
-            print("*** Getting {}'s data\n".format(sys.argv[n]))
+            log("*** Getting {}'s data\n".format(sys.argv[n]))
             vehicle = sys.argv[n]
             data_list = read_data_from_csv(vehicle, data_list)
         data_list.sort(key=lambda coordinate: coordinate['datetime'])
 
-        print("\n*** Sending commands for mininet and simulation\n")
+        log("\n*** Sending commands for mininet and simulation\n")
         for coordinate in data_list:
             command = "set.{}.setPosition(\"{},{},0.0\")"\
                 .format(coordinate['vehicle'],

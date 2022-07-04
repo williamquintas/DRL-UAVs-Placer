@@ -3,6 +3,7 @@ import sys
 import threading
 import time
 from utils.constants import DATA_COMMUNICATED_LIST_SIZE, SIMULATION_SOCKET_PORT
+from utils.print import log
 
 WAIT_SECONDS = 1
 
@@ -35,13 +36,13 @@ def read_files() -> None:
                 command = "{} set_rx_tx {}".format(vehicle, str(lines))
                 send_command_to_simulation(command)
         except:
-            print("{} dat file not found".format(vehicle))
+            log("{} dat file not found".format(vehicle))
 
     threading.Timer(WAIT_SECONDS, read_files).start()
 
 if __name__ == '__main__':
     if len(sys.argv) <= 1:
-        print("No vehicles passed in arguments. \n")
+        log("No vehicles passed in arguments. \n")
         sys.exit()
     else:
         time.sleep(1) # Required to wait files to be created
