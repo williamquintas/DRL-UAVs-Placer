@@ -1,27 +1,9 @@
-import os, random, sys, threading
-from utils.constants import FILES_SIZES
+import os, sys, threading
 from subprocess import Popen, PIPE
 
 WAIT_SECONDS = 1
 SERVER_ADDRESS = "10.0.0.3"
 PATH = os.path.dirname(os.path.abspath(__file__))
-
-def should_get_file():
-    return random.random() >= 0.9
-
-
-def get_file():
-    if should_get_file():
-        file_size = random.choice(FILES_SIZES)
-        filename = "{}K-file.txt".format(file_size)
-
-        print("Downloading {}K-file.txt".format(filename))
-        os.system("wget -O {path}/downloaded_files/{filename} {address}/{filename} &".format(path=PATH, address=SERVER_ADDRESS, filename=filename))
-
-    else:
-        print("Not getting files this time.")
-
-    threading.Timer(WAIT_SECONDS, get_file).start()
 
 
 def build_command(interface: str, grep: str, field_position: int) -> str:
@@ -41,11 +23,15 @@ def read_tx(interface: str) -> int:
 
 
 def measure_rx_tx():
-    interface = "{}-wlan0".format(sys.argv[1])
-    print(interface, read_rx(interface), read_tx(interface))
+    vehicle = sys.argv[1]
+    interface = "{}-wlan0".format(vehicle)
+
+    rx, tx = (read_rx(interface), read_tx(interface))
+    with open('{}_rx_tx.dat'.format(vehicle), 'a', encoding='utf-8') as file:
+        file.write('{},{}\n'.format(rx, tx))
+
     threading.Timer(WAIT_SECONDS, measure_rx_tx).start()
 
 
 if __name__ == '__main__':
-    get_file()
     measure_rx_tx()

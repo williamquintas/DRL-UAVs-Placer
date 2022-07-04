@@ -12,6 +12,7 @@ class SimulationController:
         self._hosts = []
         self._uavs = []
         self._center_of_mass = None
+        self._weighted_center_of_mass = None
 
         if 'hosts' in kw_args:
             self._hosts = kw_args['hosts']
@@ -45,19 +46,37 @@ class SimulationController:
         self._calculate_center_of_mass()
         return self._center_of_mass
 
+    def get_weighted_center_of_mass(self):
+        self._calculate_center_of_mass()
+        return self._weighted_center_of_mass
+
     def _calculate_center_of_mass(self):
         x_sum = 0.0
         y_sum = 0.0
         hosts_quantity = len(self._hosts)
 
+        weighted_x_sum = 0.0
+        weighted_y_sum = 0.0
+        weights_sum = 0.0
+
         for host in self.get_hosts():
             position = host.get_position()
+            avg_data_communicated_per_second = host.get_avg_data_communicated_per_second()
             x_sum += position['x']
             y_sum += position['y']
+
+            weighted_x_sum += position['x'] * (1 + avg_data_communicated_per_second)
+            weighted_y_sum += position['y'] * (1 + avg_data_communicated_per_second)
+            weights_sum += 1 + avg_data_communicated_per_second
 
         self._center_of_mass = {
             'x': round(x_sum / hosts_quantity, 2),
             'y': round(y_sum / hosts_quantity, 2)
+        }
+
+        self._weighted_center_of_mass = {
+            'x': weighted_x_sum / weights_sum,
+            'y': weighted_y_sum / weights_sum
         }
 
 
