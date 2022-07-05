@@ -41,8 +41,9 @@ class SimulationRunner:
 
     def _process_command(self, command: str, hostname: str, *args) -> None:
         if command == SET_POSITION:
-            coordinates = list(map(float, args[0]))
-            self._process_set_position(hostname, x=coordinates[0], y=coordinates[1])
+            x, y = float(args[0][0]),float(args[0][1])
+            timestamp = args[0][2]
+            self._process_set_position(hostname, x=x, y=y, timestamp=timestamp)
         elif command == SET_RX_TX:
             data_list = args[0]
             self._process_set_rx_tx(hostname, data_list)

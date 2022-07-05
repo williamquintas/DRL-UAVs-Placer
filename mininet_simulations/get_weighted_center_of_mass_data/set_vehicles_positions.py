@@ -76,9 +76,11 @@ if __name__ == '__main__':
                         str(coordinate['latitude'])
                         )
             send_command_to_mininet_socket(command)
-            command = "{} set_position {} {}" \
+            command = "{} set_position {} {} {}" \
                 .format(coordinate['vehicle'],
                         str(coordinate['longitude']),
-                        str(coordinate['latitude'])
+                        str(coordinate['latitude']),
+                        "T".join([coordinate['date'], coordinate['time']])
                         )
             send_command_to_simulation(command)
+        print("***** Finished sending coordinates! *****")
