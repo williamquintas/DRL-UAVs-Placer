@@ -1,6 +1,7 @@
-import os, random, threading
+import os, random, sys, threading
+sys.path.append('..')
 from utils.constants import FILES_SIZES
-from utils.print import log
+from utils.log import log
 
 WAIT_SECONDS = 1
 SERVER_ADDRESS = "10.0.0.3"

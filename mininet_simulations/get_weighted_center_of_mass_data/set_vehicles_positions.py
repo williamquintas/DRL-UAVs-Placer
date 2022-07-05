@@ -1,12 +1,9 @@
 #!/usr/bin/python
-import csv
-import os
-import socket
-import sys
-import time
+import csv, socket, sys, time
+sys.path.append('..')
 
 from utils.constants import SIMULATION_SOCKET_PORT, MININET_SOCKET_PORT
-from utils.print import log
+from utils.log import log
 
 
 def build_client(port: int) -> socket:
@@ -41,8 +38,7 @@ def filter_row_fields(column: dict) -> bool:
 
 
 def read_data_from_csv(vehicle_name: str, coordinates_list: str) -> list:
-    path = os.path.dirname(os.path.abspath(__file__))
-    file_path = '{}/data/{}.csv'.format(path, vehicle_name)
+    file_path = '../data/{}.csv'.format(vehicle_name)
 
     with open(file_path, 'r', encoding='utf-8') as csv_file:
         data = csv.reader(csv_file)

@@ -1,5 +1,5 @@
-import time
-import os
+import sys, time, os
+sys.path.append('..')
 
 from mininet.log import setLogLevel
 from mn_wifi.link import wmediumd, adhoc

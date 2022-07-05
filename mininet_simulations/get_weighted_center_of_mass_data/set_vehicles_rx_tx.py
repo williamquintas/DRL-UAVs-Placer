@@ -1,9 +1,8 @@
-import socket
-import sys
-import threading
-import time
+import socket, sys, threading, time
+sys.path.append('..')
+
 from utils.constants import DATA_COMMUNICATED_LIST_SIZE, SIMULATION_SOCKET_PORT
-from utils.print import log
+from utils.log import log
 
 WAIT_SECONDS = 1
 

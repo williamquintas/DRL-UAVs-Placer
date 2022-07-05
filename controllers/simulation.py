@@ -106,7 +106,7 @@ class SimulationRendererController():
     def _reset_ax(self):
         self._clear_lists()
         self._ax.clear()
-        self._ax.axis([0, SPACE_SIZE, 0, SPACE_SIZE])
+        self._ax.axis([-180, 180, -90, 90])
         self._ax.set_title("Simulation - {}".format(self._title))
         self._ax.set_xlabel('X')
         self._ax.set_ylabel('Y')

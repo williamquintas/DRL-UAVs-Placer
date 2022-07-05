@@ -1,13 +1,9 @@
-#!/usr/bin/python
+import socket, sys, threading
+sys.path.append('..')
+
 from utils.constants import SIMULATION_SOCKET_PORT
-from utils.print import log
+from utils.log import log
 from controllers.simulation import SimulationController, SimulationRendererController
-import socket
-import sys
-import threading
-
-
-sys.path.append('.')
 
 SET_POSITION = "set_position"
 SET_RX_TX = "set_rx_tx"
@@ -34,7 +30,6 @@ class SimulationRunner:
             host[0].set_position(kwargs)
         else:
             log("No host found with id {}.".format(hostname))
-        self._renderer.render()
 
     def _process_set_rx_tx(self, hostname: str, data_list: list):
         hosts = self._simulation.get_hosts()
@@ -43,7 +38,6 @@ class SimulationRunner:
             host[0].set_data_communicated_list(data_list)
         else:
             log("No host found with id {}.".format(hostname))
-        self._renderer.render()
 
     def _process_command(self, command: str, hostname: str, *args) -> None:
         if command == SET_POSITION:
@@ -70,10 +64,7 @@ class SimulationRunner:
 
         while True:
             connection, _ = self._server.accept()
-
-            connection_thread = threading.Thread(target=self.on_new_connection, args=(connection,))
-            connection_thread.setDaemon(True)
-            connection_thread.start()
+            threading.Thread(target=self.on_new_connection, args=(connection,)).start()
 
         self._server.close()
 

@@ -59,3 +59,5 @@ pylint.out
 mininet_simulations/dist
 
 data/buses_data/
+
+scripts/dist/
