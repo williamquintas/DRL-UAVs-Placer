@@ -1,4 +1,5 @@
-import os
+import os, sys
+sys.path.append('..')
 
 from utils.constants import FILES_SIZES
 

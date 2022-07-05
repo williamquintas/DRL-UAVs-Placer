@@ -1,5 +1,5 @@
-import time
-import os
+import sys, time, os
+sys.path.append('..')
 
 from mininet.log import setLogLevel
 from mn_wifi.link import wmediumd, adhoc
@@ -28,9 +28,9 @@ def create_topology() -> Mininet_wifi:
     net = Mininet_wifi(link=wmediumd, wmediumd_mode=interference)
 
     print("*** Creating nodes\n")
-    uav1 = net.addAccessPoint('uav1', ssid='uav1', mode='g', channel='5')
-    vehicle1 = net.addStation('vehicle1', mac='00:00:00:00:00:01', ip='10.0.0.1/8')
-    vehicle2 = net.addStation('vehicle2', mac='00:00:00:00:00:02', ip='10.0.0.2/8')
+    uav1 = net.addAccessPoint('uav1', ssid='uav1', mode='g', channel='5', min_x = -180, min_y = -90, max_x = 180, max_y = 90)
+    vehicle1 = net.addStation('vehicle1', mac='00:00:00:00:00:01', ip='10.0.0.1/8', min_x = -180, min_y = -90, max_x = 180, max_y = 90)
+    vehicle2 = net.addStation('vehicle2', mac='00:00:00:00:00:02', ip='10.0.0.2/8', min_x = -180, min_y = -90, max_x = 180, max_y = 90)
     server = net.addHost('server', mac='00:00:00:00:00:03', ip='10.0.0.3/8')
     c0 = net.addController('c0')
 
@@ -91,6 +91,6 @@ if __name__ == '__main__':
     os.system('pkill -9 -f {}/download_files.py'.format(PATH))
     os.system('pkill -9 -f {}/measure_rx_tx.py'.format(PATH))
     os.system('pkill -9 -f {}/start_server.py'.format(PATH))
-    os.system("rm -rf {path}/*.txt {path}/*.dat {path}/downloaded_files".format(path=PATH))
+    os.system("rm -rf {path}/*.txt {path}/*.dat {path}/wget-log* {path}/downloaded_files".format(path=PATH))
 
     net.stop()

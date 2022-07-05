@@ -1,11 +1,9 @@
 #!/usr/bin/python
-import csv
-import os
-import socket
-import sys
-import time
+import csv, socket, sys, time
+sys.path.append('..')
 
 from utils.constants import SIMULATION_SOCKET_PORT, MININET_SOCKET_PORT
+from utils.log import log
 
 
 def build_client(port: int) -> socket:
@@ -40,8 +38,7 @@ def filter_row_fields(column: dict) -> bool:
 
 
 def read_data_from_csv(vehicle_name: str, coordinates_list: str) -> list:
-    path = os.path.dirname(os.path.abspath(__file__))
-    file_path = '{}/data/{}.csv'.format(path, vehicle_name)
+    file_path = '../data/{}.csv'.format(vehicle_name)
 
     with open(file_path, 'r', encoding='utf-8') as csv_file:
         data = csv.reader(csv_file)
@@ -61,27 +58,29 @@ def read_data_from_csv(vehicle_name: str, coordinates_list: str) -> list:
 
 if __name__ == '__main__':
     if len(sys.argv) <= 1:
-        print("No vehicles passed in arguments. \n")
+        log("No vehicles passed in arguments. \n")
         sys.exit()
     else:
         data_list = []
         for n in range(1, len(sys.argv)):
-            print("*** Getting {}'s data\n".format(sys.argv[n]))
+            log("*** Getting {}'s data\n".format(sys.argv[n]))
             vehicle = sys.argv[n]
             data_list = read_data_from_csv(vehicle, data_list)
         data_list.sort(key=lambda coordinate: coordinate['datetime'])
 
-        print("\n*** Sending commands for mininet and simulation\n")
+        log("\n*** Sending commands for mininet and simulation\n")
         for coordinate in data_list:
             command = "set.{}.setPosition(\"{},{},0.0\")"\
                 .format(coordinate['vehicle'],
-                        str(float(coordinate['longitude']) / 10.0),
-                        str(float(coordinate['latitude']) / 10.0)
+                        str(coordinate['longitude']),
+                        str(coordinate['latitude'])
                         )
             send_command_to_mininet_socket(command)
-            command = "{} set_position {} {}" \
+            command = "{} set_position {} {} {}" \
                 .format(coordinate['vehicle'],
-                        str(float(coordinate['longitude']) / 10.0),
-                        str(float(coordinate['latitude']) / 10.0)
+                        str(coordinate['longitude']),
+                        str(coordinate['latitude']),
+                        "T".join([coordinate['date'], coordinate['time']])
                         )
             send_command_to_simulation(command)
+        print("***** Finished sending coordinates! *****")

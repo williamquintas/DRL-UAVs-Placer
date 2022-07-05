@@ -1,5 +1,7 @@
-import os, random, threading
+import os, random, sys, threading
+sys.path.append('..')
 from utils.constants import FILES_SIZES
+from utils.log import log
 
 WAIT_SECONDS = 1
 SERVER_ADDRESS = "10.0.0.3"
@@ -14,11 +16,11 @@ def get_file():
         file_size = random.choice(FILES_SIZES)
         filename = "{}K-file.txt".format(file_size)
 
-        print("Downloading {}K-file.txt".format(filename))
+        log("Downloading {}K-file.txt".format(filename))
         os.system("wget -q -O {path}/downloaded_files/{filename} {address}/{filename} &".format(path=PATH, address=SERVER_ADDRESS, filename=filename))
 
     else:
-        print("Not getting files this time.")
+        log("Not getting files this time.")
 
     threading.Timer(WAIT_SECONDS, get_file).start()
 
