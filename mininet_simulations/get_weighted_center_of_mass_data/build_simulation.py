@@ -2,7 +2,7 @@ import socket, sys, threading
 sys.path.append('..')
 
 from utils.constants import SIMULATION_SOCKET_PORT
-from utils.log import log
+from utils.log import log, write_to_file
 from controllers.simulation import SimulationController, SimulationRendererController
 
 SET_POSITION = "set_position"
@@ -26,6 +26,12 @@ class SimulationRunner:
     def _process_set_position(self, hostname: str, **kwargs):
         hosts = self._simulation.get_hosts()
         host = list(filter(lambda h: h.get_id() == hostname, hosts))
+
+        row = kwargs['timestamp']
+        for h in hosts:
+            row += ",{},{},{}".format(h.get_position()['x'], h.get_position()['y'], h.get_avg_data_communicated_per_second())
+        write_to_file("{}\n".format(row))
+
         if(host):
             host[0].set_position(kwargs)
         else:

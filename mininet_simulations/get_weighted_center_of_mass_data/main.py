@@ -91,6 +91,6 @@ if __name__ == '__main__':
     os.system('pkill -9 -f {}/download_files.py'.format(PATH))
     os.system('pkill -9 -f {}/measure_rx_tx.py'.format(PATH))
     os.system('pkill -9 -f {}/start_server.py'.format(PATH))
-    os.system("rm -rf {path}/*.txt {path}/*.dat {path}/downloaded_files".format(path=PATH))
+    os.system("rm -rf {path}/*.txt {path}/*.dat {path}/wget-log* {path}/downloaded_files".format(path=PATH))
 
     net.stop()
