@@ -60,4 +60,4 @@ mininet_simulations/dist
 
 data/buses_data/
 
-scripts/dist/
+simulations/mn_wifi/dist/
