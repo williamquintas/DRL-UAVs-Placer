@@ -32,25 +32,25 @@ class SimulationController:
 
         self._calculate_center_of_mass()
 
-    def to_json(self):
+    def to_json(self) -> str:
         return json.dumps(self, default=lambda o: o.__dict__,
                           sort_keys=True, indent=2)
 
-    def get_hosts(self):
+    def get_hosts(self) -> list[HostController]:
         return self._hosts
 
-    def get_uavs(self):
+    def get_uavs(self) -> list[UAVController]:
         return self._uavs
 
-    def get_center_of_mass(self):
+    def get_center_of_mass(self) -> dict[str, float]:
         self._calculate_center_of_mass()
         return self._center_of_mass
 
-    def get_weighted_center_of_mass(self):
+    def get_weighted_center_of_mass(self) -> float:
         self._calculate_center_of_mass()
         return self._weighted_center_of_mass
 
-    def _calculate_center_of_mass(self):
+    def _calculate_center_of_mass(self) -> None:
         x_sum = 0.0
         y_sum = 0.0
         hosts_quantity = len(self._hosts)
