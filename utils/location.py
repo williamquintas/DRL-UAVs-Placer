@@ -1,5 +1,6 @@
 import random
 import numpy as np
+from geopy.distance import geodesic
 
 # comment the line below to generate different random numbers
 random.seed(1)
@@ -17,6 +18,15 @@ def calculate_distance(point1, point2):
     p1_as_arr = np.array((point1['x'], point1['y']))
     p2_as_arr = np.array((point2['x'], point2['y']))
     return np.linalg.norm(p1_as_arr - p2_as_arr)
+
+
+def calculate_geodesic_distance(point1, point2):
+    return geodesic(point1, point2).kilometers
+
+
+def calculate_geodesic_movement(point, direction, distance):
+    new_point = geodesic(kilometers=distance).destination(point, bearing=direction)
+    return (new_point[1], new_point[0])
 
 
 def check_limits(pos_x, pos_y, max_value, min_value=0.0):
