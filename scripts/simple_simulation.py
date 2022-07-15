@@ -2,8 +2,6 @@ import sys
 sys.path.append('.')
 from controllers.simulation import SimulationController, SimulationRendererController
 
-
-
 simulation = SimulationController(host_quantity=5, uav_quantity=2)
 renderer = SimulationRendererController(simulation, title="Simple simulation")
 

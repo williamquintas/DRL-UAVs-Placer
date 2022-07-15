@@ -17,6 +17,9 @@ class UAVController:
     def get_position(self):
         return self._position
 
+    def set_position(self, position):
+        self._position = position
+
     def move_position(self, x_step, y_step):
         new_x = self._position['x'] + x_step
         new_y = self._position['y'] + y_step
