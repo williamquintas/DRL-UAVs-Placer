@@ -6,10 +6,10 @@ from geopy.distance import geodesic
 random.seed(1)
 
 
-def generate_random_position(max_value=10):
+def generate_random_coordinates():
     point = {
-        'x': round(random.uniform(0, max_value), 1),
-        'y': round(random.uniform(0, max_value), 1)
+        'x': random.uniform(-180.0, 180.0),
+        'y': random.uniform(-90.0, 90.0)
     }
     return point
 
@@ -21,12 +21,12 @@ def calculate_distance(point1, point2):
 
 
 def calculate_geodesic_distance(point1, point2):
-    return geodesic(point1, point2).kilometers
+    return geodesic((point1['y'],point1['x']), (point2['y'],point2['x'])).kilometers
 
 
 def calculate_geodesic_movement(point, direction, distance):
-    new_point = geodesic(kilometers=distance).destination(point, bearing=direction)
-    return (new_point[1], new_point[0])
+    new_point = geodesic(kilometers=distance).destination((point['y'], point['x']), bearing=direction)
+    return { 'x': new_point[1], 'y': new_point[0] }
 
 
 def check_limits(pos_x, pos_y, max_value, min_value=0.0):

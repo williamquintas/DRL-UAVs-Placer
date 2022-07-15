@@ -10,8 +10,10 @@ gym = "*"
 autopep8 = "*"
 pylint = "*"
 3to2 = "*"
+geopy="*"
 
 [dev-packages]
+ipykernel = "*"
 
 [requires]
 python_version = "*"
