@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from controllers.host import HostController
 from controllers.uav import UAVController
 from utils.constants import SPACE_SIZE
-from utils.location import generate_random_position
+from utils.location import generate_random_coordinates
 
 
 class SimulationController:
@@ -18,39 +18,42 @@ class SimulationController:
             self._hosts = kw_args['hosts']
         else:
             for host_index in range(host_quantity):
-                position = generate_random_position(SPACE_SIZE)
+                position = generate_random_coordinates()
                 id = kw_args['hosts_names'][host_index] \
                     if 'hosts_names' in kw_args \
                     else "host_{}".format(host_index)
                 new_host = HostController(id, position)
                 self._hosts.append(new_host)
 
-        for uav_index in range(uav_quantity):
-            position = generate_random_position(SPACE_SIZE)
-            new_uav = UAVController("uav_{}".format(uav_index), position)
-            self._uavs.append(new_uav)
+        if 'uavs' in kw_args:
+            self._uavs = kw_args['uavs']
+        else:
+            for uav_index in range(uav_quantity):
+                position = generate_random_coordinates()
+                new_uav = UAVController("uav_{}".format(uav_index), position)
+                self._uavs.append(new_uav)
 
         self._calculate_center_of_mass()
 
-    def to_json(self):
+    def to_json(self) -> str:
         return json.dumps(self, default=lambda o: o.__dict__,
                           sort_keys=True, indent=2)
 
-    def get_hosts(self):
+    def get_hosts(self) -> list[HostController]:
         return self._hosts
 
-    def get_uavs(self):
+    def get_uavs(self) -> list[UAVController]:
         return self._uavs
 
-    def get_center_of_mass(self):
+    def get_center_of_mass(self) -> dict[str, float]:
         self._calculate_center_of_mass()
         return self._center_of_mass
 
-    def get_weighted_center_of_mass(self):
+    def get_weighted_center_of_mass(self) -> float:
         self._calculate_center_of_mass()
         return self._weighted_center_of_mass
 
-    def _calculate_center_of_mass(self):
+    def _calculate_center_of_mass(self) -> None:
         x_sum = 0.0
         y_sum = 0.0
         hosts_quantity = len(self._hosts)
@@ -70,8 +73,8 @@ class SimulationController:
             weights_sum += 1 + avg_data_communicated_per_second
 
         self._center_of_mass = {
-            'x': round(x_sum / hosts_quantity, 2),
-            'y': round(y_sum / hosts_quantity, 2)
+            'x': x_sum / hosts_quantity,
+            'y': y_sum / hosts_quantity
         }
 
         self._weighted_center_of_mass = {
