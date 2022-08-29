@@ -1,11 +1,11 @@
+import pygame
 import random
 import numpy as np
+from pygame import gfxdraw
 from typing import Optional
 from gym import Env
 from gym.spaces import Discrete, Box
-from gym.error import DependencyNotInstalled
 from controllers.host import HostController
-
 from controllers.simulation import SimulationController
 from controllers.uav import UAVController
 import utils.location as loc
@@ -152,15 +152,55 @@ class UAVPlacerEnv(Env):
         return self.state, reward, done, info
 
 
-    def render(self, mode="human"):
-        try:
-            import pygame
-            from pygame import gfxdraw
-        except ImportError:
-            raise DependencyNotInstalled(
-                "pygame is not installed, run `pip install gym[classic_control]`"
-            )
+    def _render_uav(self):
+        x_scale = self.screen_width / 360.0
+        y_scale = self.screen_height / 180.0
 
+        uav_radius = 5
+        uav_color = (0,0,255)
+        uav_x, uav_y = self.state[0], self.state[1]
+
+        uav_draw_x = int((uav_x + 180) * x_scale)
+        uav_draw_y = int((uav_y + 90) * y_scale)
+
+        gfxdraw.filled_circle(
+            self.surf,
+            uav_draw_x,
+            uav_draw_y,
+            uav_radius,
+            uav_color,
+        )
+
+        return { 'text': f'UAV lat:{uav_y:.3f}, lon:{uav_x:.3f}', 'position': (uav_draw_x, uav_draw_y) }
+
+
+    def _render_hosts(self):
+        x_scale = self.screen_width / 360.0
+        y_scale = self.screen_height / 180.0
+        labels = []
+
+        hosts = self.simulation.get_hosts()
+
+        for host in hosts:
+            host_size = 7
+            host_color = (255,0,0)
+            host_position = host.get_position()
+
+            host_x, host_y = host_position['x'], host_position['y']
+            host_draw_x = int((host_x + 180) * x_scale)
+            host_draw_y = int((host_y + 90) * y_scale)
+
+            left, right, top, bottom = -host_size / 2, host_size / 2, host_size / 2, -host_size / 2
+            host_coords = [(left, bottom), (left, top), (right, top), (right, bottom)]
+            host_coords = [(c[0] + host_draw_x, c[1] + host_draw_y) for c in host_coords]
+            gfxdraw.filled_polygon(self.surf, host_coords, host_color)
+
+            labels.append({ 'text': f'{host.get_id()} lat:{host_y:.3f}, lon:{host_x:.3f}', 'position': (host_draw_x, host_draw_y) })
+
+        return labels
+
+
+    def render(self, mode="human"):
         if self.screen is None:
             pygame.init()
             if mode == "human":
@@ -174,57 +214,31 @@ class UAVPlacerEnv(Env):
         if self.clock is None:
             self.clock = pygame.time.Clock()
 
-        x_scale = self.screen_width / 180.0
-        y_scale = self.screen_width / 90.0
         font = pygame.font.SysFont('arial', 10)
 
         if self.state is None:
             return None
 
-        uav_radius = 5
-        uav_color = (0,0,255)
-        uav_x, uav_y = self.state[0], self.state[1]
-        uav_draw_x = int(uav_x * x_scale + self.screen_width / 2.0)
-        uav_draw_y = int(uav_y * y_scale + self.screen_height / 2.0)
-
         self.surf = pygame.Surface((self.screen_width, self.screen_height))
         self.surf.fill((255, 255, 255))
 
-        # Draw UAV
-        gfxdraw.filled_circle(
-            self.surf,
-            uav_draw_x,
-            uav_draw_y,
-            uav_radius,
-            uav_color,
-        )
-
-        # Draw hosts
-        hosts = self.simulation.get_hosts()
-        for host in hosts:
-            host_size = 5
-            host_color = (255,0,255)
-            host_position = host.get_position()
-
-            host_x, host_y = host_position['x'], host_position['y']
-            host_draw_x = int(host_x * x_scale + self.screen_width / 2.0)
-            host_draw_y = int(host_y * y_scale + self.screen_height / 2.0)
-
-            left, right, top, bottom = -host_size / 2, host_size / 2, host_size / 2, -host_size / 2
-            host_coords = [(left, bottom), (left, top), (right, top), (right, bottom)]
-            host_coords = [(c[0] + host_draw_x, c[1] + host_draw_y) for c in host_coords]
-            gfxdraw.filled_polygon(self.surf, host_coords, host_color)
-
-            # text = font.render(f'Host{host.get_id()} lat:{host_y:.3f}, lon:{host_x:.3f}', True, (0,0,0), (255,255,255))
-            # self.screen.blit(text, (host_draw_x - 5, self.screen_height - host_draw_y + 10))
+        uav_label = self._render_uav()
+        hosts_labels = self._render_hosts()
 
         # Update screen
         self.surf = pygame.transform.flip(self.surf, False, True)
         self.screen.blit(self.surf, (0, 0))
 
         # Display UAV text
-        text = font.render(f'UAV lat:{uav_y:.3f}, lon:{uav_x:.3f}', True, (0,0,0), (255,255,255))
-        self.screen.blit(text, (uav_draw_x - 5, self.screen_height - uav_draw_y + 10))
+        text = font.render(uav_label['text'], True, (0,0,0), (255,255,255))
+        label_position = uav_label['position']
+        self.screen.blit(text, (label_position[0] - 5, self.screen_height - label_position[1] + 10))
+
+        # Display hosts text
+        for label in hosts_labels:
+            position = label['position']
+            text = font.render(label['text'], True, (0,0,0), (255,255,255))
+            self.screen.blit(text, (position[0] - 5, self.screen_height - position[1] - 20))
 
         if mode == "human":
             pygame.event.pump()
